@@ -36,7 +36,12 @@ Countermeasures above map to five recurring mechanisms: **Constrain** (limit sco
 /plugin install drift-patterns@agent-harness-lab
 ```
 
-The `drift-patterns` skill loads on demand when you design harnesses, review autonomous-agent failures, or diagnose an agent that silently went wrong.
+### Published units
+
+| Plugin | What it gives you |
+|--------|-------------------|
+| [`drift-patterns`](plugins/drift-patterns/) | The catalog above as an on-demand skill: diagnosis table, countermeasures, design-time checklist |
+| [`tool-channel-resilience`](plugins/tool-channel-resilience/) | Discipline rules for degraded tool-transport channels: small batches, background+poll, edit-then-verify |
 
 ## More units (incremental releases)
 

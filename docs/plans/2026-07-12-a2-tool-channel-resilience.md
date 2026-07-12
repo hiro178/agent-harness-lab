@@ -13,7 +13,7 @@
 
 ## 公開物
 
-1. `plugins/tool-channel-resilience/rules/tool-channel-resilience.md` — 英語化・汎用化版
+1. `plugins/tool-channel-resilience/skills/tool-channel-resilience/SKILL.md` — 英語化・汎用化版（プラグイン機構は `rules/` コンポーネントを持たないため skill として配布 — 2026-07-12 計画変更、A1 と同判断）
 2. `plugins/tool-channel-resilience/README.md` — 背景説明（どんな障害がなぜ起きるか、instructions で直せる範囲と直せない範囲）
 
 ## 実装ステップ
@@ -31,6 +31,19 @@
 
 ## 完了の定義
 
-- [ ] 英語版ルール + README 完成、内部参照ゼロ
-- [ ] background + poll パターンの動作検証記録あり
-- [ ] marketplace.json 登録済み
+- [x] 英語版ルール + README 完成、内部参照ゼロ
+- [x] background + poll パターンの動作検証記録あり
+- [x] marketplace.json 登録済み
+
+## 検証記録（2026-07-12）
+
+SKILL.md 記載の canonical pattern を実行して動作確認:
+
+```text
+$ { { sleep 3; echo "heavy work done"; } > tmp/run.log 2>&1; echo "RC=$?" >> tmp/run.log; } &
+$ until grep -q "RC=" tmp/run.log 2>/dev/null; do sleep 1; done; cat tmp/run.log
+heavy work done
+RC=0
+```
+
+バックグラウンド実行がセンチネル `RC=0` を書き込み、ポーリングループが検出して内容を返すことを macOS (Darwin 25.5.0) で確認。`timeout` 非依存。

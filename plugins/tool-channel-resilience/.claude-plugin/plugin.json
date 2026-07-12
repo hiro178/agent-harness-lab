@@ -1,0 +1,13 @@
+{
+  "name": "tool-channel-resilience",
+  "description": "Discipline rules for surviving degraded tool-transport channels: small batches, background+poll for heavy commands, edit-then-verify, and graceful checkpointing. Bounds the blast radius of transport failures that instructions cannot prevent.",
+  "version": "0.1.0",
+  "author": {
+    "name": "hiro178",
+    "url": "https://github.com/hiro178"
+  },
+  "homepage": "https://github.com/hiro178/agent-harness-lab",
+  "repository": "https://github.com/hiro178/agent-harness-lab",
+  "license": "MIT",
+  "keywords": ["agent-reliability", "harness-engineering", "tool-calls", "resilience", "claude-code"]
+}
