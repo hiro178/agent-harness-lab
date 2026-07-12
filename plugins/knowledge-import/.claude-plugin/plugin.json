@@ -1,0 +1,13 @@
+{
+  "name": "knowledge-import",
+  "description": "Turns external content into project artifacts only after source triangulation, deduplication, and validation gates pass. Distinguishes descriptive design insights (extend your docs) from normative standards (audit and fix your real config/code).",
+  "version": "0.1.0",
+  "author": {
+    "name": "hiro178",
+    "url": "https://github.com/hiro178"
+  },
+  "homepage": "https://github.com/hiro178/agent-harness-lab",
+  "repository": "https://github.com/hiro178/agent-harness-lab",
+  "license": "MIT",
+  "keywords": ["knowledge-management", "triangulation", "agent-reliability", "harness-engineering", "claude-code"]
+}

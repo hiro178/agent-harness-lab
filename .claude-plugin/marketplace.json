@@ -35,6 +35,15 @@
       "author": {
         "name": "hiro178"
       }
+    },
+    {
+      "name": "knowledge-import",
+      "source": "./plugins/knowledge-import",
+      "description": "Turns external content into project artifacts only after source triangulation, deduplication, and validation gates pass. Distinguishes descriptive insights (extend docs) from normative standards (audit and fix real config/code).",
+      "version": "0.1.0",
+      "author": {
+        "name": "hiro178"
+      }
     }
   ]
 }

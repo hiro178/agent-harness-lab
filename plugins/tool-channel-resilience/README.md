@@ -1,5 +1,7 @@
 # tool-channel-resilience plugin
 
+*[English](README.md) | [日本語](README_ja.md)*
+
 Discipline rules for surviving a degraded tool-transport channel — the layer between an AI agent and its tool execution.
 
 ## The problem

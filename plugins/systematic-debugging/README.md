@@ -1,5 +1,7 @@
 # systematic-debugging plugin
 
+*[English](README.md) | [日本語](README_ja.md)*
+
 Root-cause-first debugging as an enforceable discipline — extended for agent workflows.
 
 ## What's different from the well-known version

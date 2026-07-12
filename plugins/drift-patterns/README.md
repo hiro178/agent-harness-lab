@@ -1,5 +1,7 @@
 # drift-patterns plugin
 
+*[English](README.md) | [日本語](README_ja.md)*
+
 Ships the `drift-patterns` skill: a self-contained catalog of 10 silent agent failure modes with structural countermeasures, plus a diagnosis table and a design-time checklist.
 
 ## Install

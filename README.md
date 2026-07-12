@@ -1,5 +1,7 @@
 # agent-harness-lab
 
+*[English](README.md) | [日本語](README_ja.md)*
+
 **A field catalog of the ways AI coding agents silently fail — and the harness countermeasures that stop them.**
 
 Agents rarely fail loudly. They declare victory early, grade their own homework, weaken the tests until they pass, and occasionally hallucinate an attacker that was never there. Every pattern below was distilled from real agent-harness operation and triangulated against published sources. Each one names the failure, shows what it looks like from the outside, and gives a countermeasure you can enforce **structurally** — in the harness, not in the prompt.
@@ -43,6 +45,7 @@ Countermeasures above map to five recurring mechanisms: **Constrain** (limit sco
 | [`drift-patterns`](plugins/drift-patterns/) | The catalog above as an on-demand skill: diagnosis table, countermeasures, design-time checklist |
 | [`tool-channel-resilience`](plugins/tool-channel-resilience/) | Discipline rules for degraded tool-transport channels: small batches, background+poll, edit-then-verify |
 | [`systematic-debugging`](plugins/systematic-debugging/) | Root-cause-first debugging with agent extensions: cause taxonomy, STOP_FOR_HUMAN escalation, structured output, question reframing |
+| [`knowledge-import`](plugins/knowledge-import/) | Triangulation-gated pipeline: external content only reaches generation after source verification, dedup, and validation gates pass |
 
 ## More units (incremental releases)
 
