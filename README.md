@@ -42,6 +42,7 @@ Countermeasures above map to five recurring mechanisms: **Constrain** (limit sco
 |--------|-------------------|
 | [`drift-patterns`](plugins/drift-patterns/) | The catalog above as an on-demand skill: diagnosis table, countermeasures, design-time checklist |
 | [`tool-channel-resilience`](plugins/tool-channel-resilience/) | Discipline rules for degraded tool-transport channels: small batches, background+poll, edit-then-verify |
+| [`systematic-debugging`](plugins/systematic-debugging/) | Root-cause-first debugging with agent extensions: cause taxonomy, STOP_FOR_HUMAN escalation, structured output, question reframing |
 
 ## More units (incremental releases)
 
