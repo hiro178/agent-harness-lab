@@ -1,0 +1,22 @@
+{
+  "name": "agent-harness-lab",
+  "owner": {
+    "name": "hiro178",
+    "url": "https://github.com/hiro178"
+  },
+  "metadata": {
+    "description": "Small, focused plugins for AI agent harness reliability — drift patterns, debugging discipline, adversarial verification.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "drift-patterns",
+      "source": "./plugins/drift-patterns",
+      "description": "Catalog of 10 agent failure modes (drift patterns) and their structural harness countermeasures, loaded as an on-demand skill.",
+      "version": "0.1.0",
+      "author": {
+        "name": "hiro178"
+      }
+    }
+  ]
+}

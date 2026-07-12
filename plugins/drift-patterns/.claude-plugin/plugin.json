@@ -1,0 +1,13 @@
+{
+  "name": "drift-patterns",
+  "description": "Catalog of 10 agent failure modes (drift patterns) and their structural harness countermeasures. The skill loads on demand when designing harnesses, reviewing autonomous-agent failures, or diagnosing silent agent misbehavior.",
+  "version": "0.1.0",
+  "author": {
+    "name": "hiro178",
+    "url": "https://github.com/hiro178"
+  },
+  "homepage": "https://github.com/hiro178/agent-harness-lab",
+  "repository": "https://github.com/hiro178/agent-harness-lab",
+  "license": "MIT",
+  "keywords": ["agent-reliability", "harness-engineering", "drift-patterns", "verification", "claude-code"]
+}
