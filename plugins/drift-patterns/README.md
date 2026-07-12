@@ -4,9 +4,18 @@
 
 Loads a list of 10 sneaky ways AI agents fail, plus how to spot each one and what to do about it.
 
+```mermaid
+flowchart LR
+    A[You notice something off] --> B[Check the diagnosis table]
+    B --> C[Find the matching pattern]
+    C --> D[Apply the listed fix]
+```
+
 ## What you get
 
-A skill your AI assistant can load whenever it's relevant — a self-contained catalog of 10 failure patterns, a table for matching a symptom you're seeing to the pattern it's probably caused by, and a checklist for building safeguards into a new project *before* these problems show up.
+- A self-contained catalog of 10 failure patterns your AI assistant can load whenever it's relevant.
+- A diagnosis table for matching a symptom you're seeing to the pattern it's probably caused by.
+- A checklist for building safeguards into a new project *before* these problems show up.
 
 ## Install
 
