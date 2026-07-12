@@ -140,6 +140,8 @@ Score candidate artifact types using the signal patterns and decision tree in [`
 
 **Purpose**: before generating new artifacts, check whether extracted insights should be **integrated into existing artifacts** instead of stored as standalone references. Design principles and failure patterns often belong inside an existing rule or skill, not as an isolated new file.
 
+**Ordering note**: this phase runs before Gate 0 in the pipeline, but only its *analysis* half (mapping, scoring, drafting the diff) is unconditional. The *execution* half — actually applying a diff to an existing artifact — is gated by Gate 0: a downgraded import (Gate 0 Route C, or the non-interactive auto-downgrade) may still produce a Phase 3.5 analysis and score, but that analysis is discarded rather than applied, and the item routes to Reference Memory instead. Do the analysis regardless of Gate 0's eventual outcome — Gate 0 controls what happens with the result, not whether the thinking happens.
+
 For each item categorized as Design Implication or Constraint:
 
 1. **Map to existing artifacts** — search your project's rules/agents/skills/CLAUDE.md/memory for related content.
@@ -240,7 +242,7 @@ Sits between Phase 4 (Deduplication) and Phase 5 (Generation) — a standalone c
 
 **Non-interactive environments** (CI/batch, no interactive user prompt available): on Gate 0 failure, log the reason, auto-downgrade to Route C semantics (skip 3.5, continue to 4/5 as memory-only, tag `triangulation_status: downgraded`), and continue rather than hang waiting for input that will never come.
 
-**Anti-gaming constraints**: `manual_override` may only tighten tiering (tertiary → secondary), never bypass Gate 0(B) by self-promoting to primary without a matching table row. The model must not auto-select the downgrade option — that decision belongs to the user. Downgraded imports skip Phase 3.5 entirely: un-triangulated knowledge never mutates existing rules/skills/agents, only ever lands as tagged reference memory.
+**Anti-gaming constraints**: `manual_override` may only tighten tiering (tertiary → secondary), never bypass Gate 0(B) by self-promoting to primary without a matching table row. The model must not auto-select the downgrade option — that decision belongs to the user. Downgraded imports skip Phase 3.5 **execution** (as noted in that phase: a completed analysis simply doesn't get applied) — un-triangulated knowledge never mutates existing rules/skills/agents, only ever lands as tagged reference memory.
 
 ## Phase 5: Generation
 

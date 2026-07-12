@@ -45,5 +45,20 @@
 ## 完了の定義
 
 - [x] 英語版 SKILL.md + 参照ファイル完成、登録先が可搬化されている（grep スキャン CLEAN、`claude plugin validate` PASS）
-- [ ] 外部記事相当のコンテンツでの実走検証記録あり（エージェント実行中）
+- [x] 外部記事相当のコンテンツでの実走検証記録あり
 - [x] marketplace.json 登録済み
+
+## 検証記録（2026-07-12）
+
+公開版 SKILL.md + 参照ファイル 2 本のみを読ませた新規 subagent（advisor によるセルフレビュー付き）で、実在の技術記事（The Pragmatic Engineer, Gergely Orosz「インシデントレビュー実務」）相当のコンテンツを使い Phase 1〜3.5 をドライラン検証（ファイル作成・編集は禁止した診断のみ）。
+
+**結果**: tertiary 判定・Gate 0 の 3 択提示・Phase 2 抽出テーブル・Phase 3 分類（ambiguous 判定、gap=0.04<0.15）・Phase 3.5 integration_score / claim_credibility 計算まで、SKILL.md の記述どおりに一貫して実行可能と確認。エージェント自身が `relevance_modifier` を type 別に変えてしまう誤りを犯したが、advisor によるセルフレビューで検出・修正 — この誤りは仕様の曖昧さ（type 間で同一値を使うべきという明文化不足）に起因していた。
+
+**フィードバック 4 件を反映**（重要度順）:
+
+1. **Phase 3.5 と Gate 0 の順序矛盾**: SKILL.md は Phase 3.5 → Gate 0 の順で記述するが、Gate 0 は「ダウングレード時は Phase 3.5 をスキップする」と書いており循環的に読めた。→ Phase 3.5 に「analysis は無条件、execution（実際の適用）のみ Gate 0 でゲートされる」と明記し、Gate 0 側の文言も「skip execution」に修正
+2. **`relevance_modifier` の算出基準未定義**: type 別に値を変えられる余地があった。→ 「コンテンツ 1 件につき 1 値、type 間で使い回す」と明記（Gate 0 のアンチゲーミング規律と同じ精神と接続）
+3. **tertiary/secondary の境界軸が不明瞭**: 個人だが著名な実務者ニュースレターの扱いが曖昧だった。→ 「軸は知名度ではなく組織所属」と明記し、個別昇格は `manual_override` の正規ルートに委ねると整理
+4. **3種の「confidence」の混同**: 抽出忠実度・分類確信度・claim_credibility が未区別だった。→ 3種を対比する表を追加
+
+反映後に `claude plugin validate` 再実行、PASS。

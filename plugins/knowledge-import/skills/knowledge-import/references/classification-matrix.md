@@ -48,6 +48,8 @@ relevance_modifier = 1.0 (directly applicable) | 0.8 (needs adaptation) | 0.5 (t
 specificity_bonus  = +0.1 if content has exact file paths, commands, or code
 ```
 
+**`relevance_modifier` is a single value, computed once per source-content, not per candidate type.** It measures how directly the *content itself* applies to *this project* — a property of the import, independent of which artifact type you're scoring it against. Assign it once (directly applicable / needs adaptation / tangential), then multiply every candidate type's `base_signal_score` by that same value. Varying it across candidates to nudge one type's score up is exactly the kind of self-serving miscalibration this pipeline is designed to prevent elsewhere (see the anti-gaming constraints in Gate 0) — the same discipline applies here.
+
 ## Ambiguity resolution
 
 When the top-2 confidence scores are within 0.15 of each other:
@@ -100,3 +102,21 @@ triangulation_modifier (from Step 1c):
 When an import carries multiple sources: if they converge, use the max per-source credibility; if they diverge, use the min and tag the extraction `[Divergent]`. This does not multiply into classification confidence — the two scores stay separate.
 
 **Downstream usage**: credibility < 0.5 → Phase 3.5 integration denied (memory only). 0.5–0.8 → integration allowed but flagged for user review. ≥0.8 → integration eligible without extra review.
+
+## Three different numbers named "confidence" — don't conflate them
+
+The pipeline produces three distinct scores that are easy to blur together. Keep them separate — they measure different things and are consumed by different downstream steps:
+
+| Score | Measures | Computed in | Consumed by |
+|-------|----------|--------------|-------------|
+| Extraction confidence | How faithfully a Phase 2 table row represents the source text | Phase 2 | Informal — a low score is a signal to re-read the source, nothing gates on it directly |
+| Classification confidence | Which artifact type this content should become | This file, Phase 3 | The ambiguity check (gap < 0.15 → ask the user) |
+| `claim_credibility` | How reliable the underlying claim is, from triangulation | This file's formula above | Phase 3.5's integration eligibility thresholds (0.5, 0.8) |
+
+A single import can score high on one and low on another — e.g. a tertiary single-source article can have high extraction confidence (you read it accurately) and high classification confidence (it's obviously a Rule) while still having low `claim_credibility` (nothing corroborates it yet). All three gates matter independently.
+
+## Tier boundary: organizational affiliation, not audience size or reputation
+
+The `secondary` row requires a **named organizational affiliation** — the source is published under a company or institution's editorial umbrella, not an individual's own platform. A well-known independent practitioner writing under their own name on their own newsletter or blog — regardless of audience size or industry reputation — classifies as `tertiary` under this table, by design. Fame is not the axis; institutional accountability is.
+
+If you believe an individual source's authority should count for more than `tertiary` in a specific case, that is exactly what `manual_override` is for: promote it explicitly with a recorded reason, rather than stretching the table's definition of `secondary` to fit. Keeping the table's boundary mechanical is what makes `pattern_matched` citations auditable across different people using this skill.
