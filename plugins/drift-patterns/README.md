@@ -2,7 +2,11 @@
 
 *[English](README.md) | [日本語](README_ja.md)*
 
-Ships the `drift-patterns` skill: a self-contained catalog of 10 silent agent failure modes with structural countermeasures, plus a diagnosis table and a design-time checklist.
+Loads a list of 10 sneaky ways AI agents fail, plus how to spot each one and what to do about it.
+
+## What you get
+
+A skill your AI assistant can load whenever it's relevant — a self-contained catalog of 10 failure patterns, a table for matching a symptom you're seeing to the pattern it's probably caused by, and a checklist for building safeguards into a new project *before* these problems show up.
 
 ## Install
 
@@ -11,12 +15,12 @@ Ships the `drift-patterns` skill: a self-contained catalog of 10 silent agent fa
 /plugin install drift-patterns@agent-harness-lab
 ```
 
-## When it activates
+## When it kicks in
 
-The skill loads on demand when you:
+Loads automatically when you're:
 
-- design an agent harness or autonomous workflow,
-- review why an autonomous agent silently went wrong,
-- audit a multi-agent pipeline for reliability.
+- designing how an AI agent or automated workflow should be set up,
+- trying to figure out why an unsupervised agent quietly went wrong,
+- checking a multi-step AI pipeline for reliability.
 
-Extended pattern write-ups (examples, sources) live in the repository's [`patterns/`](../../patterns/) directory.
+The full write-up for each pattern — real examples, sources — lives in the repository's [`patterns/`](../../patterns/) folder.

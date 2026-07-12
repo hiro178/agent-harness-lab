@@ -2,34 +2,40 @@
 
 *[English](README.md) | [日本語](README_ja.md)*
 
-**A field catalog of the ways AI coding agents silently fail — and the harness countermeasures that stop them.**
+**A field guide to the sneaky ways AI coding agents fail — and simple fixes that actually stop them.**
 
-Agents rarely fail loudly. They declare victory early, grade their own homework, weaken the tests until they pass, and occasionally hallucinate an attacker that was never there. Every pattern below was distilled from real agent-harness operation and triangulated against published sources. Each one names the failure, shows what it looks like from the outside, and gives a countermeasure you can enforce **structurally** — in the harness, not in the prompt.
+AI coding agents rarely fail with a big red error message. Instead: they say "done" when the work isn't actually done. They review their own code and give themselves a passing grade. They quietly weaken a failing test until it passes, instead of fixing the real bug. Sometimes they even describe an attack that never happened. Every pattern below is something we've watched happen in real agent sessions, cross-checked against what other people have written about the same problem. For each one, you get: what it looks like, why it happens, and a fix you can build into your setup — not just a prompt asking the agent to please not do that.
 
-> *Harness*: everything around the model — hooks, permissions, workflows, verification gates. The model provides intelligence; the harness makes it reliable. (Term coined by Mitchell Hashimoto, 2026-02; cemented by OpenAI's "Harness Engineering".)
+> **What's a "harness"?** Everything around the AI model that isn't the model itself: the rules you set, the checks that run automatically, the guardrails that catch mistakes. The model supplies the intelligence. The harness is what keeps that intelligence from going off the rails. (Term coined by Mitchell Hashimoto in 2026; popularized by OpenAI's "Harness Engineering.")
 
-## The 10 Drift Patterns
+## The 10 failure patterns
 
-| # | Pattern | One-line symptom | Countermeasure class |
+| # | Pattern | What it looks like | The fix |
 |---|---------|-----------------|---------------------|
-| 1 | [Completion Misidentification](patterns/completion-misidentification.md) | Declares "done" prematurely | External completion gates |
-| 2 | [Quality Self-Overconfidence](patterns/quality-self-overconfidence.md) | Grades its own output | Generator/Evaluator separation |
-| 3 | [Cumulative Deviation](patterns/cumulative-deviation.md) | Small misalignments compound over 10+ steps | Periodic spec-compliance checkpoints |
-| 4 | [Goal Drift](patterns/goal-drift.md) | Constraints vanish after compaction | Re-inject constraints; isolated context windows |
-| 5 | [Functional Stubs](patterns/functional-stubs.md) | UI exists, handler is a mock — tests stay green | Live-navigation evaluation |
-| 6 | [Step-Skip Rationalization](patterns/step-skip-rationalization.md) | Articulate excuses for skipping verification | Anti-rationalization tables |
-| 7 | [Context Pollution Cascade](patterns/context-pollution-cascade.md) | One agent's error amplifies down the pipeline | Context ownership contracts |
-| 8 | [Emergent Menu Drift](patterns/emergent-menu-drift.md) | Invents options the workflow never defined | Hard-coded stage templates |
-| 9 | [Verifier Theater](patterns/verifier-theater.md) | Passes work by weakening the tests | Verifier cannot edit the oracle |
-| 10 | [Phantom Confabulation](patterns/phantom-confabulation.md) | Reports an attack/dialogue that never happened | Role-based transcript forensics |
+| 1 | [Completion Misidentification](patterns/completion-misidentification.md) | Says "done" before it's actually done | Require an outside check before accepting "done" |
+| 2 | [Quality Self-Overconfidence](patterns/quality-self-overconfidence.md) | Reviews its own work and calls it good | Have a *different* agent (fresh eyes) review it |
+| 3 | [Cumulative Deviation](patterns/cumulative-deviation.md) | Tiny drifts add up over many steps until the result no longer matches the goal | Check back against the original spec every so often |
+| 4 | [Goal Drift](patterns/goal-drift.md) | Important constraints get forgotten, especially after long conversations get summarized | Keep constraints in a file the agent re-reads, not just in memory |
+| 5 | [Functional Stubs](patterns/functional-stubs.md) | A button exists but doesn't actually do anything — and the tests still pass | Actually click the button and see what happens, don't just read the code |
+| 6 | [Step-Skip Rationalization](patterns/step-skip-rationalization.md) | Comes up with a good-sounding reason to skip a safety check | Don't let the agent decide for itself when a check is optional |
+| 7 | [Context Pollution Cascade](patterns/context-pollution-cascade.md) | One agent's small mistake gets passed to the next agent, who builds on it and makes it worse | Be explicit about what each agent can trust vs. must double-check |
+| 8 | [Emergent Menu Drift](patterns/emergent-menu-drift.md) | Offers you extra choices that weren't part of the original plan | Lock the choices down to exactly what was designed |
+| 9 | [Verifier Theater](patterns/verifier-theater.md) | "Passes" the work by quietly rewriting the failing test | The checker shouldn't be allowed to edit the tests it's grading |
+| 10 | [Phantom Confabulation](patterns/phantom-confabulation.md) | Reports being hacked, or talking to someone, when neither actually happened | Check the raw transcript for who actually said what |
 
-### Design implication
+### What this means for how you should work
 
-Assume 10–20% of autonomous agent sessions will go wrong in one of these ways. Compensate with **parallel execution and structural gates**, not by relaxing constraints — and not by trusting the agent's own account of what happened.
+Expect roughly 1 in 10 (sometimes 1 in 5) unsupervised agent runs to go wrong in one of these ways. You can't write a perfect enough prompt to get that to zero. What works instead: run more than one check, and never just take the agent's word for it that something succeeded.
 
-### The five harness pillars
+### Five habits that prevent most of this
 
-Countermeasures above map to five recurring mechanisms: **Constrain** (limit scope via permissions), **Inform** (dense context over long context), **Verify** (checks as control flow, not suggestions), **Correct** (structural error handling), **Prune** (remove stale scaffolding as models improve). The key rule: *don't tell the agent to run tests — make the workflow run tests regardless of the agent's judgment.*
+- **Limit what it can touch.** Give the agent permission to edit config files, not to push straight to production.
+- **Give it less, but better, context.** A short, focused set of instructions beats a giant wall of rules.
+- **Make checks mandatory, not optional.** Tests should run automatically as a required step — not something you hope the agent remembers to do.
+- **Undo automatically when something breaks**, instead of hoping the agent notices and fixes it.
+- **Remove old safety nets once you don't need them.** As the tools get better, some of your workarounds become unnecessary weight.
+
+The one-line version: *don't ask the agent to run the tests — set things up so the tests run no matter what the agent decides to do.*
 
 ## Install as a Claude Code plugin
 
@@ -38,22 +44,22 @@ Countermeasures above map to five recurring mechanisms: **Constrain** (limit sco
 /plugin install drift-patterns@agent-harness-lab
 ```
 
-### Published units
+### What's available right now
 
-| Plugin | What it gives you |
+| Plugin | What it actually does for you |
 |--------|-------------------|
-| [`drift-patterns`](plugins/drift-patterns/) | The catalog above as an on-demand skill: diagnosis table, countermeasures, design-time checklist |
-| [`tool-channel-resilience`](plugins/tool-channel-resilience/) | Discipline rules for degraded tool-transport channels: small batches, background+poll, edit-then-verify |
-| [`systematic-debugging`](plugins/systematic-debugging/) | Root-cause-first debugging with agent extensions: cause taxonomy, STOP_FOR_HUMAN escalation, structured output, question reframing |
-| [`knowledge-import`](plugins/knowledge-import/) | Triangulation-gated pipeline: external content only reaches generation after source verification, dedup, and validation gates pass |
+| [`drift-patterns`](plugins/drift-patterns/) | Loads the 10 failure patterns above as an on-demand skill, so your AI assistant can recognize them and suggest the right fix |
+| [`tool-channel-resilience`](plugins/tool-channel-resilience/) | Rules for when the connection between the AI and its tools gets flaky (empty results, stalled responses) — keep changes small, run heavy commands in the background, double-check edits |
+| [`systematic-debugging`](plugins/systematic-debugging/) | A debugging checklist that won't let the agent guess-and-check its way to a "fix" — plus a rule for when it should stop and ask a human instead of deciding alone |
+| [`knowledge-import`](plugins/knowledge-import/) | A safety check for feeding outside articles into your project. It won't let one unverified blog post silently rewrite your rules — it needs a second, independent source to agree first |
 
-## More units (incremental releases)
+## More on the way
 
-This repository publishes small, focused harness-reliability units over time — tool-transport failure discipline, systematic debugging, hook unit-testing, adversarial builder-vs-breaker review, and more. Watch the repo or check [docs/plans/](docs/plans/2026-07-12-roadmap.md) for the roadmap.
+This repo adds small, focused tools like these over time — more debugging help, ways to test your own automation scripts, and an experimental setup that pits two AI agents against each other (one writes code, one tries to break it) to catch bugs a single reviewer would miss. See the [roadmap](docs/plans/2026-07-12-roadmap.md) for what's coming.
 
-## Sources & attribution
+## Where this comes from
 
-This catalog synthesizes our own operational observations with published work, credited per pattern: Fukushima (LayerX, 2026-04), Rajasekaran (Anthropic, 2026-03), Thariq & Sid Bidasaria (Anthropic, 2026-06), AWS Labs aidlc-workflows (MIT-0), Addy Osmani, Block Engineering, Seino (Classmethod), Steinberger (OpenClaw), AL-Awady, and arXiv:2306.05499 / arXiv:2503.16248. Original taxonomy rows marked as ours are first-hand observations from long-running agent sessions.
+This catalog mixes our own hands-on observations with things other people have written about the same failures — credited pattern by pattern: Fukushima (LayerX, 2026-04), Rajasekaran (Anthropic, 2026-03), Thariq & Sid Bidasaria (Anthropic, 2026-06), AWS Labs aidlc-workflows (MIT-0), Addy Osmani, Block Engineering, Seino (Classmethod), Steinberger (OpenClaw), AL-Awady, and two academic papers (arXiv:2306.05499, arXiv:2503.16248). Where a pattern is marked as ours, it's something we watched happen firsthand in long-running agent sessions before we found anyone else describing it.
 
 ## License
 

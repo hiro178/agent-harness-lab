@@ -2,34 +2,40 @@
 
 *[English](README.md) | [日本語](README_ja.md)*
 
-**AI コーディングエージェントが静かに失敗する仕組みのフィールドカタログ — そして、それを止めるハーネス対策集。**
+**AIコーディングエージェントが気づかないうちに失敗する、よくある手口の見取り図 —— そして実際に効く直し方。**
 
-エージェントは滅多に派手には失敗しない。早すぎる「完了」宣言、自分の宿題の自己採点、テストが通るまでテストを弱める、時には存在しない攻撃者を幻視することさえある。以下の各パターンは実際のエージェントハーネス運用から蒸留し、公開されているソースと突き合わせて検証したものだ。それぞれ失敗の名前・外から見える兆候・**構造的に**強制できる対策（プロンプトではなくハーネスで強制する対策）を示す。
+AIコーディングエージェントは、大きなエラーメッセージを出して派手に失敗することは滅多にない。代わりに何が起きるかというと: まだ終わっていないのに「完了」と言う。自分のコードを自分でレビューして自分に合格点をつける。本当のバグを直す代わりに、失敗しているテストの方をこっそり弱めて通してしまう。時には、起きてもいない攻撃を報告することさえある。以下の各パターンは、実際のエージェントセッションで実際に観察したもので、他の人が同じ問題について書いている内容とも突き合わせて確認済みだ。それぞれについて、どんな見た目をしているか・なぜ起きるか・そして「エージェントにお願いする」のではなく仕組みとして組み込める直し方を示す。
 
-> *ハーネス*: モデルの周りにあるすべて — フック、パーミッション、ワークフロー、検証ゲート。モデルは知性を提供し、ハーネスはそれを信頼できるものにする（用語は Mitchell Hashimoto が 2026-02 に提唱、OpenAI の "Harness Engineering" で定着）。
+> **「ハーネス」って何?** AIモデル自体ではない、その周りにあるすべてのもの: 設定したルール、自動で走るチェック、間違いを捕まえるガードレール。モデルは知性を提供し、ハーネスはその知性が脱線しないよう抑える役割を担う。（用語は Mitchell Hashimoto が 2026 年に提唱し、OpenAI の "Harness Engineering" で広まった。）
 
-## 10 の Drift Pattern（失敗モード）
+## 10 の失敗パターン
 
-| # | パターン | 一言で言う症状 | 対策の分類 |
+| # | パターン | どんな見た目か | 直し方 |
 |---|---------|-----------------|---------------------|
-| 1 | [Completion Misidentification](patterns/completion-misidentification.md) | 早すぎる「完了」宣言 | 外部完了ゲート |
-| 2 | [Quality Self-Overconfidence](patterns/quality-self-overconfidence.md) | 自分の出力を自分で採点する | Generator/Evaluator 分離 |
-| 3 | [Cumulative Deviation](patterns/cumulative-deviation.md) | 小さなズレが 10 ステップ以上かけて蓄積する | 定期的な仕様準拠チェックポイント |
-| 4 | [Goal Drift](patterns/goal-drift.md) | 圧縮（compaction）後に制約が消える | 制約の再注入、独立したコンテキストウィンドウ |
-| 5 | [Functional Stubs](patterns/functional-stubs.md) | UI は存在するがハンドラがモック — テストは緑のまま | ライブナビゲーション評価 |
-| 6 | [Step-Skip Rationalization](patterns/step-skip-rationalization.md) | 検証をスキップするもっともらしい言い訳 | アンチ合理化テーブル |
-| 7 | [Context Pollution Cascade](patterns/context-pollution-cascade.md) | 1エージェントの誤りがパイプライン下流で増幅する | コンテキスト所有契約 |
-| 8 | [Emergent Menu Drift](patterns/emergent-menu-drift.md) | ワークフローが定義していない選択肢を勝手に作る | ステージテンプレートのハードコード |
-| 9 | [Verifier Theater](patterns/verifier-theater.md) | テストを弱めて作業を「合格」させる | 検証者はオラクル（テスト）を編集できない |
-| 10 | [Phantom Confabulation](patterns/phantom-confabulation.md) | 起きていない攻撃や対話を報告する | ロールベースのトランスクリプト・フォレンジック |
+| 1 | [Completion Misidentification](patterns/completion-misidentification.md) | 実際には終わっていないのに「完了」と言う | 「完了」を受け入れる前に外部チェックを必須にする |
+| 2 | [Quality Self-Overconfidence](patterns/quality-self-overconfidence.md) | 自分の作業を自分でレビューして合格にする | *別の*エージェント（先入観のない目）にレビューさせる |
+| 3 | [Cumulative Deviation](patterns/cumulative-deviation.md) | 小さなズレが何ステップも積み重なり、結果が目的からずれる | 定期的に元の仕様と照らし合わせる |
+| 4 | [Goal Drift](patterns/goal-drift.md) | 重要な制約が忘れられる。特に長い会話が要約された後に起きやすい | 制約はエージェントが読み返すファイルに置く。記憶頼みにしない |
+| 5 | [Functional Stubs](patterns/functional-stubs.md) | ボタンはあるが実際には何も起きない — それでもテストは通る | コードを読むだけでなく、実際にボタンを押して確認する |
+| 6 | [Step-Skip Rationalization](patterns/step-skip-rationalization.md) | 安全チェックを飛ばすもっともらしい理由を考え出す | チェックを省略していいかどうかをエージェント自身に判断させない |
+| 7 | [Context Pollution Cascade](patterns/context-pollution-cascade.md) | あるエージェントの小さな間違いが次のエージェントに渡り、それを土台にさらに悪化する | 各エージェントが「信じてよいもの」と「必ず再確認すべきもの」を明確に分ける |
+| 8 | [Emergent Menu Drift](patterns/emergent-menu-drift.md) | 元の計画にはなかった選択肢を勝手に提示してくる | 選択肢を設計どおりのものだけに固定する |
+| 9 | [Verifier Theater](patterns/verifier-theater.md) | 失敗しているテストをこっそり書き換えて作業を「合格」にする | 採点する側がその採点対象のテストを編集できないようにする |
+| 10 | [Phantom Confabulation](patterns/phantom-confabulation.md) | 起きていない攻撃や、していない会話を報告する | 生のログを見て、実際に誰が何を言ったかを確認する |
 
-### 設計への含意
+### これが仕事の進め方にとって意味すること
 
-自律エージェントセッションの 10〜20% はこれらのいずれかの形で誤ると想定せよ。制約を緩めることでも、エージェント自身の説明を信じることでもなく、**並列実行と構造的ゲート**で補償する。
+自律実行するエージェントセッションのうち、だいたい10回に1回（時には5回に1回）はこれらのどれかの形で誤ると思っておくとよい。プロンプトをどれだけ工夫してもゼロにはできない。代わりに効くのは: チェックを1つだけでなく複数走らせること、そして「成功しました」というエージェント自身の申告を鵜呑みにしないことだ。
 
-### 5 つのハーネス原則（Five Pillars）
+### たいていの問題を防ぐ5つの習慣
 
-上記の対策は 5 つの繰り返し現れる仕組みに対応する: **Constrain**（パーミッションでスコープを制限する）、**Inform**（長いコンテキストより密なコンテキスト）、**Verify**（チェックを提案でなく制御フローにする）、**Correct**（構造的なエラー処理）、**Prune**（モデルの能力向上に合わせて古い足場を外す）。核となる原則: *「エージェントにテストを実行するよう指示する」のではなく「エージェントの判断に関わらずワークフローがテストを実行する」ようにする*。
+- **触れる範囲を制限する。** 設定ファイルの編集は許可しても、本番環境への直接反映までは許可しない。
+- **情報量ではなく、密度を上げる。** 分厚いルール集より、短く焦点の絞られた指示のほうが効く。
+- **チェックを「任意」ではなく「必須」にする。** テストはエージェントが覚えていてくれることを願うものではなく、自動で必ず走る仕組みにする。
+- **問題が起きたら自動で元に戻す。** エージェントが気づいて直してくれることを期待しない。
+- **不要になった安全策は外す。** ツールの性能が上がるにつれ、以前の回避策が余計な重荷になることがある。
+
+一言で言えば: *「テストを実行して」とエージェントにお願いするのではなく、エージェントが何を判断しようとテストが必ず走る仕組みにする*。
 
 ## Claude Code プラグインとしてインストール
 
@@ -38,22 +44,22 @@
 /plugin install drift-patterns@agent-harness-lab
 ```
 
-### 公開済みユニット
+### 今すぐ使えるもの
 
-| プラグイン | 提供内容 |
+| プラグイン | 実際に何をしてくれるか |
 |--------|-------------------|
-| [`drift-patterns`](plugins/drift-patterns/) | 上記カタログをオンデマンドスキル化: 診断テーブル・対策・設計時チェックリスト |
-| [`tool-channel-resilience`](plugins/tool-channel-resilience/) | ツールチャネル劣化時の規律: 小バッチ・background+poll・edit-then-verify |
-| [`systematic-debugging`](plugins/systematic-debugging/) | エージェント拡張版の根本原因優先デバッグ: 原因タクソノミー・STOP_FOR_HUMAN エスカレーション・構造化出力・問い再構成 |
-| [`knowledge-import`](plugins/knowledge-import/) | 三角測量ゲート付きパイプライン: 外部コンテンツは出所検証・重複排除・検証ゲートを通過して初めて生成に到達する |
+| [`drift-patterns`](plugins/drift-patterns/) | 上記10パターンをオンデマンドのスキルとして読み込む。AIアシスタントがこれらを認識し、正しい直し方を提案できるようになる |
+| [`tool-channel-resilience`](plugins/tool-channel-resilience/) | AIとツールの間の接続が不安定なとき（結果が空になる・応答が止まる）の対処ルール。変更は小さく保つ、重い処理はバックグラウンドで走らせる、編集後は必ず確認する |
+| [`systematic-debugging`](plugins/systematic-debugging/) | エージェントが当てずっぽうで「直った」ことにしてしまわないようにするデバッグ手順。加えて、独断で判断せず人間に立ち止まって確認すべきタイミングのルール |
+| [`knowledge-import`](plugins/knowledge-import/) | 外部の記事をプロジェクトに取り込む際の安全チェック。裏取りされていないブログ記事1本でルールが書き換わってしまうことがないよう、独立した2つ目の情報源が一致することを要求する |
 
-## 今後のユニット（順次公開）
+## 今後の追加予定
 
-このリポジトリは小粒で焦点を絞ったハーネス信頼性ユニットを継続的に公開する — ツールチャネル障害の規律、体系的デバッグ、フック単体テスト、敵対的 Builder-vs-Breaker レビューなど。ロードマップは [docs/plans/](docs/plans/2026-07-12-roadmap.md) を参照。
+このリポジトリは、こうした小粒で焦点の絞られたツールを今後も継続的に追加していく予定だ — さらなるデバッグ支援、自分の自動化スクリプトをテストする仕組み、そして実験的な取り組みとして「1つのAIがコードを書き、もう1つのAIがそれを壊そうとする」形で、1人のレビュアーでは見逃すバグを捕まえる仕組みなど。今後の計画は [ロードマップ](docs/plans/2026-07-12-roadmap.md) を参照。
 
-## 出典・帰属
+## 出典
 
-本カタログは独自の運用観察と公開済みの知見を統合したもので、パターンごとに出典を明記している: Fukushima (LayerX, 2026-04)、Rajasekaran (Anthropic, 2026-03)、Thariq & Sid Bidasaria (Anthropic, 2026-06)、AWS Labs aidlc-workflows (MIT-0)、Addy Osmani、Block Engineering、Seino (Classmethod)、Steinberger (OpenClaw)、AL-Awady、arXiv:2306.05499 / arXiv:2503.16248。独自成果として明記した行は、長時間稼働するエージェントセッションからの一次観察である。
+このカタログは、自分たちが実際に手を動かして観察した内容と、同じ問題について他の人が書いた内容を組み合わせたもので、パターンごとに出典を明記している: Fukushima (LayerX, 2026-04)、Rajasekaran (Anthropic, 2026-03)、Thariq & Sid Bidasaria (Anthropic, 2026-06)、AWS Labs aidlc-workflows (MIT-0)、Addy Osmani、Block Engineering、Seino (Classmethod)、Steinberger (OpenClaw)、AL-Awady、そして2本の学術論文（arXiv:2306.05499、arXiv:2503.16248）。「独自の観察」と明記した行は、他の誰かが同じことを書いているのを見つける前に、自分たちが実際のエージェントセッションで直接目撃したものだ。
 
 ## ライセンス
 

@@ -2,18 +2,18 @@
 
 *[English](README.md) | [日本語](README_ja.md)*
 
-A pipeline for turning external content into project artifacts — gated on source triangulation, not "summarize and save."
+A safety check for feeding outside content into your project — not "read a link and summarize it."
 
-## The problem with naive knowledge import
+## The problem with the naive version
 
-Ask an agent to "import this article as a rule" and it will happily read one blog post and mutate your CLAUDE.md. One unverified source now has write access to your project's design rationale. This plugin adds the missing gate: **content only reaches generation after it clears source triangulation, deduplication, and structural validation** — all enforced as control flow, not as prompt suggestions the model can rationalize past.
+Tell an agent to "import this article as a rule" and it will happily read one blog post and rewrite your project's guidelines based on it. One unverified source now has write access to how your whole project is supposed to work. This plugin adds the missing safety check: **content only gets turned into a real change after it clears a few checks** — is this source actually trustworthy, does a second independent source agree with it, does something like this already exist — all enforced automatically, not just suggested in a prompt the agent can talk itself out of following.
 
 ## What makes this different from "read a link and summarize it"
 
-- **Authority tiering + triangulation** (Phase 1): sources are tiered (primary/secondary/tertiary) against an explicit decision table, and anti-gaming constraints stop the model from self-promoting a source's tier. Single-source tertiary imports are blocked from mutating anything until a second independent source is found — or the user explicitly accepts a downgrade.
-- **Integration vs. new artifact vs. audit-and-fix** (Phases 3.5/3.6): the pipeline distinguishes three outcomes that are usually conflated — extend an existing rule with a new failure mode, generate a standalone new artifact, or (when the imported content is a normative standard) **audit your real config/code against it and remediate the divergence**, with dry-run, backup, and risk-classed approval gates.
-- **Deduplication as a blocking gate** (Phase 4): exact-match imports are blocked outright, not silently duplicated.
-- **Validation gates before anything ships** (Phase 6): frontmatter, structure, dedup-recheck, convention compliance — all fail-closed.
+- **It checks how trustworthy the source is, and asks for a second opinion.** Sources get ranked (official docs and peer-reviewed papers rank highest; a random personal blog ranks lowest), and there are rules stopping the agent from quietly upgrading a source's ranking to make its own life easier. A single low-ranked source can't change anything on its own — it needs a second, independent source to agree, or an explicit "yes, use just this one" from you.
+- **It tells apart three very different outcomes**, which usually get lumped together: extending something you already have with a new insight, creating something brand new, or — when the imported content is a checklist/standard rather than an idea — **actually checking your real project against it and fixing what doesn't match** (with a preview of every change, a backup, and a sign-off required for anything risky).
+- **Exact duplicates get blocked outright**, not silently created twice.
+- **Nothing ships without passing a final check** — formatting, structure, "does this already exist," does it match your project's conventions.
 
 ## Install
 
@@ -22,8 +22,8 @@ Ask an agent to "import this article as a rule" and it will happily read one blo
 /plugin install knowledge-import@agent-harness-lab
 ```
 
-## When it activates
+## When it kicks in
 
-When you ask to import, integrate, or incorporate external content into the project, or to audit a real artifact against an imported best-practice checklist.
+When you ask to import, integrate, or fold outside content into your project — or to check something real (a config file, a piece of code) against a checklist or standard you found somewhere.
 
-Full pipeline detail — routing table, classification matrix, remediation procedure — lives in [`skills/knowledge-import/SKILL.md`](skills/knowledge-import/SKILL.md) and its `references/`.
+The full step-by-step process — how sources get ranked, how content gets classified, how fixes get applied safely — lives in [`skills/knowledge-import/SKILL.md`](skills/knowledge-import/SKILL.md) and its `references/` folder.
